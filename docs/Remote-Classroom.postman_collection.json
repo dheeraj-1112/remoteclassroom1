@@ -1,0 +1,28 @@
+{
+  "info": {
+    "name": "Remote Classroom API",
+    "description": "Local API requests for Sprint I–III validation. Set baseUrl, token, subjectId and lectureId variables before use.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8000/api"},
+    {"key": "token", "value": ""},
+    {"key": "subjectId", "value": "1"},
+    {"key": "lectureId", "value": "1"}
+  ],
+  "item": [
+    {"name": "Health", "request": {"method": "GET", "url": "{{baseUrl}}/health/"}},
+    {"name": "Login faculty demo", "request": {"method": "POST", "header": [{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw":"{\n  \"username\": \"faculty.demo\",\n  \"password\": \"DemoOnlyChange123!\"\n}"}, "url": "{{baseUrl}}/auth/login/"}, "event": [{"listen":"test","script":{"type":"text/javascript","exec":["if (pm.response.code === 200) { pm.collectionVariables.set('token', pm.response.json().token); }"]}}]},
+    {"name": "Current user", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/auth/me/"}},
+    {"name": "List subjects", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/subjects/"}},
+    {"name": "My subjects", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/subjects/mine/"}},
+    {"name": "Create subject (faculty)", "request": {"method": "POST", "header": [{"key":"Authorization","value":"Token {{token}}"},{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw":"{\n  \"code\": \"CSE102\",\n  \"name\": \"Computer Networks\",\n  \"description\": \"Sample subject for Remote Classroom.\"\n}"}, "url": "{{baseUrl}}/subjects/"}},
+    {"name": "Enroll in subject (student)", "request": {"method": "POST", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/subjects/{{subjectId}}/enroll/"}},
+    {"name": "List lectures", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/lectures/"}},
+    {"name": "Lecture detail / processing status", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/lectures/{{lectureId}}/"}},
+    {"name": "Schedule live class", "request": {"method": "POST", "header": [{"key":"Authorization","value":"Token {{token}}"},{"key":"Content-Type","value":"application/json"}], "body": {"mode":"raw","raw":"{\n  \"subject\": {{subjectId}},\n  \"title\": \"Unit revision\",\n  \"description\": \"Join using the link below.\",\n  \"starts_at\": \"2027-01-15T09:30:00+05:30\",\n  \"meeting_url\": \"https://meet.google.com/your-room-code\"\n}"}, "url": "{{baseUrl}}/live-classes/"}},
+    {"name": "Upcoming live classes", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/live-classes/"}},
+    {"name": "Notifications", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/notifications/"}},
+    {"name": "Dashboard counts", "request": {"method": "GET", "header": [{"key":"Authorization","value":"Token {{token}}"}], "url": "{{baseUrl}}/dashboard/"}}
+  ]
+}

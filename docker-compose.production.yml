@@ -1,0 +1,26 @@
+# Production topology. Configure DATABASE_URL to point to managed PostgreSQL (e.g. AWS RDS),
+# REDIS_URL to a managed Redis service, and S3 variables in .env.production.
+services:
+  backend:
+    build: ./backend
+    env_file: .env.production
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 3600"
+    restart: unless-stopped
+    expose:
+      - "8000"
+
+  worker:
+    build: ./backend
+    env_file: .env.production
+    command: celery -A config worker --loglevel=INFO --concurrency=1
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

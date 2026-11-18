@@ -1,0 +1,70 @@
+services:
+  - type: web
+    name: remote-classroom-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./backend/Dockerfile.render
+    dockerContext: ./backend
+    healthCheckPath: /api/health/
+    autoDeploy: true
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: remote-classroom-api.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://remote-classroom-web.onrender.com
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://remote-classroom-api.onrender.com,https://remote-classroom-web.onrender.com
+      - key: FREE_TIER_MODE
+        value: "true"
+      - key: ENABLE_HLS_PROCESSING
+        value: "false"
+      - key: MAX_LECTURE_UPLOAD_MB
+        value: "25"
+      - key: AWS_QUERYSTRING_AUTH
+        value: "true"
+      - key: AWS_S3_ADDRESSING_STYLE
+        value: path
+      - key: AWS_S3_SIGNATURE_VERSION
+        value: s3v4
+      - key: DATABASE_URL
+        sync: false
+      - key: AWS_STORAGE_BUCKET_NAME
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_S3_ENDPOINT_URL
+        sync: false
+      - key: AWS_S3_REGION_NAME
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: BOOTSTRAP_FACULTY_USERNAME
+        sync: false
+      - key: BOOTSTRAP_FACULTY_PASSWORD
+        sync: false
+      - key: BOOTSTRAP_FACULTY_EMAIL
+        sync: false
+
+  - type: web
+    name: remote-classroom-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://remote-classroom-api.onrender.com/api
+      - key: VITE_FREE_TIER_MODE
+        value: "true"
